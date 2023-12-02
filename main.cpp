@@ -2,7 +2,7 @@
 #include <string>
 
 #include "Money.h"
-#include "CustomizedBank.h"
+#include "Bank.h"
 
 using namespace std;
 

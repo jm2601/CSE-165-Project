@@ -37,7 +37,6 @@ public:
 	// bank should be ordered with the highest priority at index 0 and lowest at 11
 	void sortBank() {
 		// insertion sort or something simple, empty for now since it's already sorted
-		for (int)
 	}
 
 	// Fills the bank with dollars/coins based on the balance
