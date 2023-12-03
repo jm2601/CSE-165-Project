@@ -1,34 +1,34 @@
 #include <iostream>
-#include <string>
 
-#include "Money.h"
 #include "Bank.h"
+//#include "CoinBank.h"
+//#include "DollarBank.h"
 
 using namespace std;
 
-int main( int argc, const char* argv[] )
+int main(int argc, const char* argv[])
 {
 	double input;
 	char choice;
+	Bank* myBank;
 
-	//cout << "Would you like to create a bank with customizable priorities? Enter \"y\" for yes or \"n\" for no." << endl;
-	//cin >> choice;
-	//if (choice == 'y') {
-		CustomizedBank myBank;
-	//}
+	myBank = new Bank;
 
-	myBank.buildMoney();
+	myBank->deposit(100);
+	myBank->print();
 
-	// Testing modifyBalance
-	cout << "Enter an input: ";
-	cin >> input;
-	myBank.modifyBalance(input);
-	
-	// Testing print
-	myBank.print();
+	myBank->deposit(49, 2);
+	myBank->deposit(50, 2);
+	myBank->print();
 
-	// Testing modifyMoney (for CustomizedBank only)
-	myBank.modifyMoney();
+	myBank->withdraw(999);
+	myBank->withdraw(50);
+	myBank->print();
+
+	myBank->withdraw(45, 3);
+	myBank->withdraw(99, 3);
+	myBank->withdraw(50, 3);
+	myBank->print();
 
 	return 0;
 }
