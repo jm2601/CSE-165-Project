@@ -7,7 +7,6 @@ class Bank {
 protected:
 	double balance;										// Total amount of money
 	Money bank[12];										// An array that stores the data for each dollar/coin type
-	// Array is ordered from highest priority to least
 	int size = (sizeof(bank) / sizeof(Money));			// Used for array calculations
 
 public:
@@ -28,16 +27,6 @@ public:
 		bank[9] = Money("Dime", 0.10, 0);				// Dime
 		bank[10] = Money("Nickel", 0.05, 0);			// Nickel
 		bank[11] = Money("Penny", 0.01, 0);				// Penny
-	}
-
-	// This sorts the bank and is called whenever a priority is modified
-	// bank should be ordered with the highest priority at index 0 and lowest at 11
-	virtual void sortBank() {
-		// insertion sort or something simple, empty for now since it's already sorted
-		for (int i = 0; i < size; i++) {
-
-		}
-		std::cout << size << std::endl;
 	}
 
 	// Sets the quantity of everything to 0
@@ -67,7 +56,7 @@ public:
 	virtual void emptyBank(double b) {
 		double tracker = 0;		// Keeps track of how many dollars/coins need to be removed from the balance
 		for (int i = 0; i < size; i++) {
-			// Repeatedly add a dollar/coin to balance until it can no longer fit, then move to the next type
+			// Repeatedly remove a dollar/coin to balance until it can no longer fit, then move to the next type
 			// round is used to prevent rounding errors
 			while (bank[i].value <= (round((b - tracker) * 100) / 100)) {
 				tracker += bank[i].value;
@@ -91,6 +80,11 @@ public:
 	// Deposit function
 	// Adds the input to the balance
 	virtual void deposit(double b) {
+		// Do not deposit if the input is too small
+		if (b < 0.01) {
+			std::cout << "$" << b << " is an invalid dollar/coin value." << std::endl;
+			return;
+		}
 		balance += b;
 		std::cout << "Deposited $" << b << " to the bank." << std::endl;
 		fillBank(b);
@@ -99,6 +93,11 @@ public:
 	// The second deposit function
 	// Syntax: deposit(value of dollar/coin type, quantity to deposit)
 	virtual void deposit(double v, int q) {
+		// Do not deposit if the input is too small
+		if (v < 0.01) {
+			std::cout << "$" << v << " is an invalid dollar/coin value." << std::endl;
+			return;
+		}
 		// Verify that the v input is a valid value
 		for (int i = 0; i < size; i++) {
 			if (v == bank[i].value) {
@@ -117,7 +116,7 @@ public:
 	}
 
 	// Withdraw function
-	// Same as deposit except negative
+	// Nearly the same as deposit except negative
 	virtual void withdraw(double b) {
 		// Do not withdraw if the input exceeds balance
 		if (b > balance) {
@@ -130,6 +129,7 @@ public:
 	}
 
 	// Second withdraw function
+	// Nearly the same as second deposit except negative
 	virtual void withdraw(double v, int q) {
 		double b = v * q;
 		// Do not withdraw if the input exceeds balance
@@ -158,7 +158,7 @@ public:
 		std::cout << "\nBank contents:" << std::endl;
 		for (int i = 0; i < size; i++) {
 			// Do not print dollar/coin types that have quantity 0
-			if (bank[i].quantity != 0) {
+			if (bank[i].quantity > 0) {
 				std::cout << bank[i].name << ": " << bank[i].quantity << " ($" << bank[i].total << ")" << std::endl;
 			}
 		}

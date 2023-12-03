@@ -1,32 +1,41 @@
 #pragma once
 
-#include <iostream>
-#include <string>
 #include <cmath>
 #include "Bank.h"
 
 class DollarBank : public Bank {
+	Money bank[7];									// An array that stores the data for each coin type
+	int size = (sizeof(bank) / sizeof(Money));		// Used for array calculations
+
 public:
 	// Create an empty bank with only dollar info
-	Bank() {
+	DollarBank() {
 		balance = 0;
 
-		bank[0] = Money("$100 Dollar Bill", 100, 11, 0);		// $100
-		bank[1] = Money("$50 Dollar Bill", 50, 10, 0);			// $50
-		bank[2] = Money("$20 Dollar Bill", 20, 9, 0);			// $20
-		bank[3] = Money("$10 Dollar Bill", 10, 8, 0);			// $10
-		bank[4] = Money("$5 Dollar Bill", 5, 7, 0);				// $5
-		bank[5] = Money("$2 Dollar Bill", 2, 6, 0);				// $2
-		bank[6] = Money("$1 Dollar Bill", 1, 5, 0);				// $1
+		bank[0] = Money("$100 Dollar Bill", 100, 0);		// $100
+		bank[1] = Money("$50 Dollar Bill", 50, 0);			// $50
+		bank[2] = Money("$20 Dollar Bill", 20, 0);			// $20
+		bank[3] = Money("$10 Dollar Bill", 10, 0);			// $10
+		bank[4] = Money("$5 Dollar Bill", 5, 0);			// $5
+		bank[5] = Money("$2 Dollar Bill", 2, 0);			// $2
+		bank[6] = Money("$1 Dollar Bill", 1, 0);			// $1
 	}
 
-	// Fills the bank with dollars based on the balance
-	// This is called whenever a change to balance occurs
-	void fillBank() {
+	// Sets the quantity of everything to 0
+	void empty() {
+		for (int i = 0; i < size; i++) {
+			bank[i].quantity = 0;
+		}
+	}
+
+	// Fills the bank with dollars based on the input
+	// This is called whenever deposit is
+	void fillBank(double b) {
 		double tracker = 0;		// Keeps track of how many dollars need to be added to the balance
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < size; i++) {
 			// Repeatedly add a dollar to balance until it can no longer fit, then move to the next type
-			while (bank[i].value <= balance - tracker) {
+			// round is used to prevent rounding errors
+			while (bank[i].value <= (round((b - tracker) * 100) / 100)) {
 				tracker += bank[i].value;
 				bank[i].quantity++;
 				bank[i].updateTotal();
@@ -34,68 +43,119 @@ public:
 		}
 	}
 
+	// Empties the bank with dollars based on the input
+	// This is called whenever withdraw is
+	void emptyBank(double b) {
+		double tracker = 0;		// Keeps track of how many dollars need to be removed from the balance
+		for (int i = 0; i < size; i++) {
+			// Repeatedly remove a dollar to balance until it can no longer fit, then move to the next type
+			// round is used to prevent rounding errors
+			while (bank[i].value <= (round((b - tracker) * 100) / 100)) {
+				tracker += bank[i].value;
+				bank[i].quantity--;
+				bank[i].updateTotal();
+			}
+		}
+
+		// Fix for negative quantities: empty the bank and refill it based on the positive balance
+		for (int i = 0; i < size; i++) {
+			if (bank[i].quantity < 0) {
+				double temp = balance;
+				empty();
+				fillBank(temp);
+			}
+		}
+	}
+
+
+	// Below this point are the functions that should actually be called
 	// Deposit function
-	// Adds an amount to the balance, but does not allow values less than 1
+	// Adds the input to the balance
 	void deposit(double b) {
-		// Do not attempt to add the value if it is less than 1
+		// Do not deposit if the input is too small
 		if (b < 1) {
-			std::cout << "Invalid value. Input must be at least $1." << std::endl;
+			std::cout << "$" << b << " is an invalid dollar value." << std::endl;
 			return;
 		}
 		balance += b;
-		fillBank();
+		std::cout << "Deposited $" << b << " to the bank." << std::endl;
+		fillBank(b);
+	}
+
+	// The second deposit function
+	// Syntax: deposit(value of dollar type, quantity to deposit)
+	void deposit(double v, int q) {
+		// Do not deposit if the input is too small
+		if (v < 1) {
+			std::cout << "$" << v << " is an invalid dollar value." << std::endl;
+			return;
+		}
+		// Verify that the v input is a valid value
+		for (int i = 0; i < size; i++) {
+			if (v == bank[i].value) {
+				double b = v * q;
+				balance += b;
+				std::cout << "Deposited $" << v << " x " << q << " to the bank." << std::endl;
+				// Repeat fillBank as many times as the quantity
+				for (int i = 0; i < q; i++) {
+					fillBank(v);
+				}
+				return;
+			}
+		}
+		// If the value is not valid
+		std::cout << "$" << v << " is an invalid dollar value." << std::endl;
 	}
 
 	// Withdraw function
-	// Same as deposit except negative
+	// Nearly the same as deposit except negative
 	void withdraw(double b) {
-		// Do not attempt to subtract the value if it is less than 1
-		if (b < 1) {
-			std::cout << "Invalid value. Input must be at least $1." << std::endl;
+		// Do not withdraw if the input exceeds balance
+		if (b > balance) {
+			std::cout << "$" << b << " exceeds the current balance of $" << balance << "." << std::endl;
 			return;
 		}
 		balance -= b;
-		fillBank();
+		std::cout << "Withdrew $" << b << " from the bank." << std::endl;
+		emptyBank(b);
 	}
 
-	// This function allows the user to modify the priority of a selected dollar given its value
-	void modifyPriority() {
-		int input;		// This is what the priority will be changed to
-		double v;		// This is the value of the dollar to be changed
-
-		// This will go on forever until a correct input is detected
-		while (0 == 0) {
-			std::cout << "Enter the value of the dollar you want to modify the priority for: ";
-			std::cin >> v;
-
-			// This loop finds the value that v corresponds to
-			for (int i = 0; i < 7; i++) {
-				if (v == bank[i].value) {
-					std::cout << "Enter priority you want to set for " << bank[i].name << ": ";
-					std::cin >> input;
-					bank[i].priority = input;
-					std::cout << "Priority of " << bank[i].name << " has been set to " << input << "." << std::endl;
-					// Sort the priorities after the change has been made
-					sortBank();
-					// This will end the function once a correct input has been entered
-					return;
-				}
-			}
-			// If the value entered is invalid, the loop will repeat
-			std::cout << "Invalid value.\n" << std::endl;
+	// Second withdraw function
+	// Nearly the same as second deposit except negative
+	void withdraw(double v, int q) {
+		double b = v * q;
+		// Do not withdraw if the input exceeds balance
+		if (b > balance) {
+			std::cout << "$" << b << " exceeds the current balance of $" << balance << "." << std::endl;
+			return;
 		}
+		// Verify that the v input is a valid value
+		for (int i = 0; i < size; i++) {
+			if (v == bank[i].value) {
+				balance -= b;
+				std::cout << "Withdrew $" << v << " x " << q << " from the bank." << std::endl;
+				// Repeat emptyBank as many times as the quantity
+				for (int i = 0; i < q; i++) {
+					emptyBank(v);
+				}
+				return;
+			}
+		}
+		// If the value is not valid
+		std::cout << "$" << v << " is an invalid dollar value." << std::endl;
 	}
 
 	// Prints all information of the bank
-	void print() {
-		// Print the balance
-		std::cout << "Balance: $" << balance << std::endl;
-		for (int i = 0; i < 5; i++) {
+	virtual void print() {
+		std::cout << "\nBank contents:" << std::endl;
+		for (int i = 0; i < size; i++) {
 			// Do not print dollar types that have quantity 0
 			if (bank[i].quantity > 0) {
-				std::cout << bank[i].name << ": " << bank[i].quantity << " ($" << bank[i].total <<
-					")" << std::endl;
+				std::cout << bank[i].name << ": " << bank[i].quantity << " ($" << bank[i].total << ")" << std::endl;
 			}
 		}
+		// Print the total balance
+		std::cout << "Total balance: $" << balance << std::endl;
+		std::cout << std::endl;
 	}
 };

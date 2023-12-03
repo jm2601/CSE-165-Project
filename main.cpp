@@ -1,8 +1,8 @@
 #include <iostream>
 
 #include "Bank.h"
-//#include "CoinBank.h"
-//#include "DollarBank.h"
+#include "CoinBank.h"
+#include "DollarBank.h"
 
 using namespace std;
 
@@ -14,6 +14,8 @@ int main(int argc, const char* argv[])
 
 	myBank = new Bank;
 
+	myBank->deposit(0.001);
+	myBank->deposit(0.01);
 	myBank->deposit(100);
 	myBank->print();
 
