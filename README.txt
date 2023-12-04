@@ -11,6 +11,7 @@ To test the program:
 
 Bank.h
 bankui.cpp
+bankui.h
 bankui.ui
 CoinBank.h
 DollarBank.h
