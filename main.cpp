@@ -1,36 +1,11 @@
-#include <iostream>
+#include "bankui.h"
 
-#include "Bank.h"
-#include "CoinBank.h"
-#include "DollarBank.h"
+#include <QApplication>
 
-using namespace std;
-
-int main(int argc, const char* argv[])
+int main(int argc, char *argv[])
 {
-	double input;
-	char choice;
-	Bank* myBank;
-
-	myBank = new Bank;
-
-	myBank->deposit(0.001);
-	myBank->deposit(0.01);
-	myBank->deposit(100);
-	myBank->print();
-
-	myBank->deposit(49, 2);
-	myBank->deposit(50, 2);
-	myBank->print();
-
-	myBank->withdraw(999);
-	myBank->withdraw(50);
-	myBank->print();
-
-	myBank->withdraw(45, 3);
-	myBank->withdraw(99, 3);
-	myBank->withdraw(50, 3);
-	myBank->print();
-
-	return 0;
+    QApplication a(argc, argv);
+    BankUI w;
+    w.show();
+    return a.exec();
 }
