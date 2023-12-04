@@ -7,3 +7,12 @@ To test the program:
 6. Translation can be left unchanged.
 7. The kit used for this project was "Desktop Qt 6.6.1 MinGW 64-bit".
 8. Summary can be left unchanged.
+9. Once the project has been created, copy the following files from my branch into your project's path:
+
+Bank.h
+bankui.cpp
+bankui.ui
+CoinBank.h
+DollarBank.h
+main.cpp
+Money.h
